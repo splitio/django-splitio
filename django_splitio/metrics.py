@@ -11,15 +11,15 @@ from .cache import metrics_cache
 _logger = logging.getLogger(__name__)
 
 
-def report_metrics():
+def report_metrics(a_metrics_cache):
     """If the reporting process is enabled (through the metrics cache), this function collects
     the time, count and gauge from the cache and sends them to Split through the events API. If the
     process fails, no exceptions are raised (but they are logged) and the process is disabled."""
     try:
-        if not metrics_cache.is_enabled():
+        if not a_metrics_cache.is_enabled():
             return
 
-        metrics = metrics_cache.fetch_all_and_clear()
+        metrics = a_metrics_cache.fetch_all_and_clear()
 
         if 'time' in metrics and len(metrics['time']) > 0:
             _logger.info('Sending times metrics...')
@@ -34,6 +34,6 @@ def report_metrics():
             sdk_api.metrics_gauge(metrics['gauge'])
     except:
         _logger.exception('Exception caught reporting metrics')
-        metrics_cache.disable()
+        a_metrics_cache.disable()
 
 metrics = AsyncMetrics(CacheBasedMetrics(metrics_cache))

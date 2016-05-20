@@ -11,7 +11,7 @@ from .cache import segment_cache, split_cache
 _logger = logging.getLogger(__name__)
 
 
-def update_segments():
+def update_segments(segment_cache):
     """If updates are enabled, this function updates all the segments listed by the segment cache
     get_registered_segments() method making requests to the Split.io SDK API. If an exception is
     raised, the process is stopped and it won't try to update segments again until enabled_updates
@@ -28,13 +28,13 @@ def update_segments():
         segment_cache.disable()
 
 
-def update_segment(segment_name):
+def update_segment(a_segment_cache, segment_name):
     """Updates a segment. It will eagerly request all changes until the change number is the same
     "till" value in the response.
     :param segment_name: The name of the segment
     :type segment_name: str
     """
-    till = segment_cache.get_change_number(segment_name)
+    till = a_segment_cache.get_change_number(segment_name)
 
     while True:
         response = segment_change_fetcher.fetch(segment_name, till)
@@ -43,12 +43,12 @@ def update_segment(segment_name):
             return
 
         if len(response['removed']) > 0:
-            segment_cache.remove_keys_from_segment(segment_name, response['removed'])
+            a_segment_cache.remove_keys_from_segment(segment_name, response['removed'])
 
         if len(response['added']) > 0:
-            segment_cache.add_keys_to_segment(segment_name, response['added'])
+            a_segment_cache.add_keys_to_segment(segment_name, response['added'])
 
-        segment_cache.set_change_number(segment_name, response['till'])
+        a_segment_cache.set_change_number(segment_name, response['till'])
 
         till = response['till']
 
@@ -72,17 +72,17 @@ class RedisSplitParser(SplitParser):
         return delegate
 
 
-def update_splits():
+def update_splits(a_split_cache):
     """If updates are enabled, this function updates (or initializes) the current cached split
     configuration. It can be called by periodic update tasks or directly to force an unscheduled
     update. If an exception is raised, the process is stopped and it won't try to update splits
     again until enabled_updates is called on the splits cache.
     """
     try:
-        if not split_cache.is_enabled():
+        if not a_split_cache.is_enabled():
             return
 
-        till = split_cache.get_change_number()
+        till = a_split_cache.get_change_number()
 
         while True:
             response = split_change_fetcher.fetch(till)
@@ -96,7 +96,7 @@ def update_splits():
 
                 for split_change in response['splits']:
                     if Status(split_change['status']) != Status.ACTIVE:
-                        split_cache.remove_split(split_change['name'])
+                        a_split_cache.remove_split(split_change['name'])
                         continue
 
                     parsed_split = split_parser.parse(split_change)
@@ -104,12 +104,12 @@ def update_splits():
                         _logger.warning(
                             'We could not parse the split definition for %s. '
                             'Removing split to be safe.', split_change['name'])
-                        split_cache.remove_split(split_change['name'])
+                        a_split_cache.remove_split(split_change['name'])
                         removed_features.append(split_change['name'])
                         continue
 
                     added_features.append(split_change['name'])
-                    split_cache.add_split(split_change['name'], parsed_split)
+                    a_split_cache.add_split(split_change['name'], parsed_split)
 
                 if len(added_features) > 0:
                     _logger.info('Updated features: %s', added_features)
@@ -118,10 +118,10 @@ def update_splits():
                     _logger.info('Deleted features: %s', removed_features)
 
             till = response['till']
-            split_cache.set_change_number(response['till'])
+            a_split_cache.set_change_number(response['till'])
     except:
         _logger.exception('Exception caught updating split definitions')
-        split_cache.disable()
+        a_split_cache.disable()
 
 
 class RedisBasedSegment(CacheBasedSegment):

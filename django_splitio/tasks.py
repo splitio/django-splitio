@@ -6,6 +6,7 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 
 from .features import update_segments, update_splits
+from .cache import segment_cache, split_cache, impressions_cache, metrics_cache
 from .impressions import report_impressions
 from .metrics import report_metrics
 from .settings import splitio_settings
@@ -48,7 +49,7 @@ def get_metrics_update_schedule():
 @shared_task(name='django_splitio.tasks.update_features_task', ignore_result=True)
 def update_features_task():
     try:
-        update_splits()
+        update_splits(split_cache)
     except:
         logger.exception('Exception caught running features update task')
 
@@ -56,7 +57,7 @@ def update_features_task():
 @shared_task(name='django_splitio.tasks.update_segments_task', ignore_result=True)
 def update_segments_task():
     try:
-        update_segments()
+        update_segments(segment_cache)
     except:
         logger.exception('Exception caught running segment definitions update task')
 
@@ -64,7 +65,7 @@ def update_segments_task():
 @shared_task(name='django_splitio.tasks.update_impressions_task', ignore_result=True)
 def update_impressions_task():
     try:
-        report_impressions()
+        report_impressions(impressions_cache)
     except:
         logger.exception('Exception caught running impressions update task')
 
@@ -72,6 +73,6 @@ def update_impressions_task():
 @shared_task(name='django_splitio.tasks.update_metrics_task', ignore_result=True)
 def update_metrics_task():
     try:
-        report_metrics()
+        report_metrics(metrics_cache)
     except:
         logger.exception('Exception caught running metrics update task')
