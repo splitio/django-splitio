@@ -4,7 +4,7 @@ from setuptools import setup
 from sys import version_info
 
 tests_require = ['Django>=1.8']
-install_requires = ['splitio-client>=0.0.1']
+install_requires = ['splitio-client>=0.0.1', 'redis>=2.10']
 
 if version_info < (3,):
     tests_require += ['mock']

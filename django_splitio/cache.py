@@ -106,7 +106,8 @@ class RedisSegmentCache(SegmentCache):
         self._redis.set(self._get_segment_change_number_key(segment_name), change_number)
 
     def get_change_number(self, segment_name):
-        return self._redis.get(self._get_segment_change_number_key(segment_name))
+        change_number = self._redis.get(self._get_segment_change_number_key(segment_name))
+        return change_number if change_number is not None else -1
 
 
 class RedisSplitCache(SplitCache):
@@ -148,7 +149,7 @@ class RedisSplitCache(SplitCache):
     def get_change_number(self):
         change_number = self._redis.get(RedisSplitCache._KEY_TEMPLATE.format(
             suffix='__change_number__'))
-        return int(change_number) if change_number is not None else -1
+        return change_number if change_number is not None else -1
 
     def set_change_number(self, change_number):
         self._redis.set(RedisSplitCache._KEY_TEMPLATE.format(suffix='__change_number__'),
