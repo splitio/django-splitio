@@ -40,14 +40,14 @@ class RedisSegmentCache(SegmentCache):
 
     def enable(self):
         """Enables the automatic update process."""
-        self._redis.delete(RedisSegmentCache)
+        self._redis.delete(RedisSegmentCache._DISABLED_KEY)
 
     def is_enabled(self):
         """
         :return: Whether the update process is enabled or not.
         :rtype: bool
         """
-        return not self._redis.exists(RedisSegmentCache)
+        return not self._redis.exists(RedisSegmentCache._DISABLED_KEY)
 
     def register_segment(self, segment_name):
         """Register a segment for inclusion in the automatic update process.
