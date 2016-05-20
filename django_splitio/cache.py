@@ -404,18 +404,17 @@ class RedisMetricsCache(MetricsCache):
         for field, value in izip(islice(response, 0, None, 2), islice(response, 1, None, 2)):
             count_match = RedisMetricsCache._COUNT_FIELD_RE.match(field)
             if count_match is not None:
-                count[count_match.group('counter')] = int(value)
+                count[count_match.group('counter')] = value
                 continue
 
             time_match = RedisMetricsCache._TIME_FIELD_RE.match(field)
             if time_match is not None:
-                time[time_match.group('operation')][int(time_match.group('bucket_index'))] = int(
-                    value)
+                time[time_match.group('operation')][int(time_match.group('bucket_index'))] = value
                 continue
 
             gauge_match = RedisMetricsCache._GAUGE_FIELD_RE.match(field)
             if gauge_match is not None:
-                gauge[gauge_match.group('gauge')] = float(value)
+                gauge[gauge_match.group('gauge')] = value
                 continue
 
         return {
