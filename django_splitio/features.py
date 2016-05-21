@@ -67,12 +67,12 @@ class RedisSplitParser(SplitParser):
         self._segment_cache = a_some_segment_cache
 
     def _parse_matcher_in_segment(self, matcher, *args, **kwargs):
-        delegate = super(RedisSplitParser, self)._parse_matcher_in_segment(matcher)
+        delegate = super(RedisSplitParser, self)._parse_matcher_in_segment(matcher, *args, **kwargs)
         self._segment_cache.register_segment(delegate.segment.name)
         return delegate
 
 
-def update_splits(a_split_cache):
+def update_splits(a_split_cache, a_split_change_fetcher, a_split_parser):
     """If updates are enabled, this function updates (or initializes) the current cached split
     configuration. It can be called by periodic update tasks or directly to force an unscheduled
     update. If an exception is raised, the process is stopped and it won't try to update splits
@@ -85,7 +85,7 @@ def update_splits(a_split_cache):
         till = a_split_cache.get_change_number()
 
         while True:
-            response = split_change_fetcher.fetch(till)
+            response = a_split_change_fetcher.fetch(till)
 
             if till >= response['till']:
                 return
@@ -99,7 +99,7 @@ def update_splits(a_split_cache):
                         a_split_cache.remove_split(split_change['name'])
                         continue
 
-                    parsed_split = split_parser.parse(split_change)
+                    parsed_split = a_split_parser.parse(split_change)
                     if parsed_split is None:
                         _logger.warning(
                             'We could not parse the split definition for %s. '
@@ -125,8 +125,14 @@ def update_splits(a_split_cache):
 
 
 class RedisBasedSegment(CacheBasedSegment):
-    """A CacheBasedSegment used for pickling/unpickling segments removing and setting the reference
-    to the local segment_cache instance."""
+    def __init__(self, name):
+        """A CacheBasedSegment used for pickling/unpickling segments removing and setting the reference
+        to the local segment_cache instance.
+        :param name: The name of the segment
+        :type name: str
+        """
+        super(RedisBasedSegment, self).__init__(name, segment_cache)
+    
     def __getstate__(self):
         old_dict = self.__dict__.copy()
         del old_dict['_segment_cache']
@@ -148,7 +154,7 @@ class RedisSegmentFetcher(CacheBasedSegmentFetcher):
         :return: A segment for the given name
         :rtype: Segment
         """
-        segment = RedisBasedSegment(name, self._segment_cache)
+        segment = RedisBasedSegment(name)
         return segment
 
 segment_change_fetcher = ApiSegmentChangeFetcher(sdk_api)
