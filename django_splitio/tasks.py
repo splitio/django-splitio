@@ -5,7 +5,7 @@ from datetime import timedelta
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .features import update_segments, update_splits
+from .features import update_segments, update_splits, segment_change_fetcher
 from .cache import segment_cache, split_cache, impressions_cache, metrics_cache
 from .impressions import report_impressions
 from .metrics import report_metrics
@@ -57,7 +57,7 @@ def update_features_task():
 @shared_task(name='django_splitio.tasks.update_segments_task', ignore_result=True)
 def update_segments_task():
     try:
-        update_segments(segment_cache)
+        update_segments(segment_cache, segment_change_fetcher)
     except:
         logger.exception('Exception caught running segment definitions update task')
 

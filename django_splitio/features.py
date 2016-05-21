@@ -11,24 +11,24 @@ from .cache import segment_cache, split_cache
 _logger = logging.getLogger(__name__)
 
 
-def update_segments(segment_cache):
+def update_segments(a_segment_cache, a_segment_change_fetcher):
     """If updates are enabled, this function updates all the segments listed by the segment cache
     get_registered_segments() method making requests to the Split.io SDK API. If an exception is
     raised, the process is stopped and it won't try to update segments again until enabled_updates
     is called on the segment cache."""
     try:
-        if not segment_cache.is_enabled():
+        if not a_segment_cache.is_enabled():
             return
 
-        registered_segments = segment_cache.get_registered_segments()
+        registered_segments = a_segment_cache.get_registered_segments()
         for name in registered_segments:
-            update_segment(name)
+            update_segment(a_segment_cache, name, a_segment_change_fetcher)
     except:
         _logger.exception('Exception caught updating segment definitions')
-        segment_cache.disable()
+        a_segment_cache.disable()
 
 
-def update_segment(a_segment_cache, segment_name):
+def update_segment(a_segment_cache, segment_name, a_segment_change_fetcher):
     """Updates a segment. It will eagerly request all changes until the change number is the same
     "till" value in the response.
     :param segment_name: The name of the segment
@@ -37,7 +37,7 @@ def update_segment(a_segment_cache, segment_name):
     till = a_segment_cache.get_change_number(segment_name)
 
     while True:
-        response = segment_change_fetcher.fetch(segment_name, till)
+        response = a_segment_change_fetcher.fetch(segment_name, till)
 
         if till >= response['till']:
             return

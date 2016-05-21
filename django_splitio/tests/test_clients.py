@@ -8,9 +8,6 @@ except ImportError:
 
 from django.test import TestCase
 
-from splitio.impressions import Impression
-from splitio.tests.utils import MockUtilsMixin
-
 from django_splitio.clients import client
 from django_splitio.features import split_fetcher
 from django_splitio.impressions import treatment_log
