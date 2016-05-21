@@ -12,35 +12,9 @@ from django.test import TestCase
 
 from splitio.tests.utils import MockUtilsMixin
 
-from django_splitio.cache import segment_cache, split_cache
-from django_splitio.api import sdk_api
+from django_splitio.cache import segment_cache
 from django_splitio.features import (update_segments, update_segment, RedisSplitParser,
-                                     update_splits, RedisBasedSegment, RedisSegmentFetcher,
-                                     segment_change_fetcher, segment_fetcher, split_parser,
-                                     split_change_fetcher, split_fetcher)
-
-
-class SingletonsTests(TestCase):
-    def test_segment_change_fetcher_built_with_sdk_api(self):
-        """Tests that the segment_change_fetcher was constructed with sdk_api"""
-        self.assertEqual(sdk_api, segment_change_fetcher._api)
-
-    def test_segment_fetcher_built_with_segment_cache(self):
-        """Tests that segment_fetcher was constructed with segment_cache"""
-        self.assertEqual(segment_cache, segment_fetcher._segment_cache)
-
-    def test_split_parser_built_with_segment_fetcher_segment_cache(self):
-        """Tests that split_parser was constructed with segment_fetcher and segment_cache"""
-        self.assertEqual(segment_cache, split_parser._segment_cache)
-        self.assertEqual(segment_fetcher, split_parser._segment_fetcher)
-
-    def test_split_change_fetcher_built_with_sdk_api(self):
-        """Tests that the segment_change_fetcher was constructed with sdk_api"""
-        self.assertEqual(sdk_api, split_change_fetcher._api)
-
-    def test_split_change_fetcher_built_with_sdk_api(self):
-        """Tests that the split_fetcher was constructed with split_cache"""
-        self.assertEqual(split_cache, split_fetcher._split_cache)
+                                     update_splits, RedisBasedSegment, RedisSegmentFetcher)
 
 
 class UpdateSegmentsTests(TestCase, MockUtilsMixin):

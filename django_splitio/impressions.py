@@ -4,13 +4,12 @@ import logging
 
 from splitio.impressions import build_impressions_data, AsyncTreatmentLog, CacheBasedTreatmentLog
 
-from .api import sdk_api
 from .cache import impressions_cache
 
 _logger = logging.getLogger(__name__)
 
 
-def report_impressions(an_impressions_cache):
+def report_impressions(an_impressions_cache, an_sdk_api):
     """If the reporting process is enabled (through the impressions cache), this function collects
     the impressions from the cache and sends them to Split through the events API. If the process
     fails, no exceptions are raised (but they are logged) and the process is disabled.
@@ -24,10 +23,10 @@ def report_impressions(an_impressions_cache):
 
         if len(test_impressions_data) > 0:
             _logger.info('Posting impressions for features: %s.', ', '.join(impressions.keys()))
-            sdk_api.test_impressions(test_impressions_data)
+            an_sdk_api.test_impressions(test_impressions_data)
     except:
         _logger.exception('Exception caught report impressions. Disabling impressions log.')
         an_impressions_cache.disable()
 
-
-treatment_log = AsyncTreatmentLog(CacheBasedTreatmentLog(impressions_cache))
+delegate_treatment_log = CacheBasedTreatmentLog(impressions_cache)
+treatment_log = AsyncTreatmentLog(delegate_treatment_log)

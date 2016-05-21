@@ -132,7 +132,7 @@ class RedisBasedSegment(CacheBasedSegment):
         :type name: str
         """
         super(RedisBasedSegment, self).__init__(name, segment_cache)
-    
+
     def __getstate__(self):
         old_dict = self.__dict__.copy()
         del old_dict['_segment_cache']

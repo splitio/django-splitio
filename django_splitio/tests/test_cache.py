@@ -11,32 +11,8 @@ from django.test import TestCase
 from splitio.impressions import Impression
 from splitio.tests.utils import MockUtilsMixin
 
-from django_splitio.cache import (segment_cache, split_cache, impressions_cache, metrics_cache,
-                                  RedisSegmentCache, RedisSplitCache, RedisImpressionsCache,
+from django_splitio.cache import (RedisSegmentCache, RedisSplitCache, RedisImpressionsCache,
                                   RedisMetricsCache)
-from django_splitio.tests.utils import redis
-
-
-class SingletonsTests(TestCase):
-    def test_segment_cache_built_with_settings_redis_factory(self):
-        """Tests that the segment_cache singleton was built with the result of calling the redis
-        factory"""
-        self.assertEqual(redis, segment_cache._redis)
-
-    def test_split_cache_built_with_settings_redis_factory(self):
-        """Tests that the split_cache singleton was built with the result of calling the redis
-        factory"""
-        self.assertEqual(redis, split_cache._redis)
-
-    def test_impressions_cache_built_with_settings_redis_factory(self):
-        """Tests that the impressions_cache singleton was built with the result of calling the redis
-        factory"""
-        self.assertEqual(redis, impressions_cache._redis)
-
-    def test_metrics_cache_built_with_settings_redis_factory(self):
-        """Tests that the metrics_cache singleton was built with the result of calling the redis
-        factory"""
-        self.assertEqual(redis, metrics_cache._redis)
 
 
 class RedisSegmentCacheTests(TestCase):
@@ -98,7 +74,8 @@ class RedisSegmentCacheTests(TestCase):
 
     def test_remove_keys_from_segment_remove_keys_from_segment_set(self):
         """Test that remove_keys_from_segment removes the keys to the segment key set"""
-        self.a_segment_cache.remove_keys_from_segment(self.some_segment_name_str, self.some_segment_keys)
+        self.a_segment_cache.remove_keys_from_segment(self.some_segment_name_str,
+                                                      self.some_segment_keys)
         self.some_redis.srem.assert_called_once_with(
             'SPLITIO.segments.segment.some_segment_name.key_set', self.some_segment_keys[0],
             self.some_segment_keys[1])
@@ -322,8 +299,8 @@ class RedisImpressionsCacheBuildImpressionsDictTests(TestCase):
 
         self.assertDictEqual({some_feature_name: some_feature_impressions,
                               some_other_feature_name: some_other_feature_impressions},
-            self.an_impressions_cache._build_impressions_dict(
-                some_feature_impressions + some_other_feature_impressions))
+                             self.an_impressions_cache._build_impressions_dict(
+                                 some_feature_impressions + some_other_feature_impressions))
 
 
 class RedisMetricsCacheTests(TestCase, MockUtilsMixin):
@@ -563,11 +540,11 @@ class RedisMetricsCacheBuildMetricsFromCacheResponseTests(TestCase):
                         some_other_time_latencies[1], 'time.some_other_time.20',
                         some_other_time_latencies[20]]
         result_time_metris = [{'name': some_other_time, 'latencies': some_other_time_latencies},
-                              {'name': some_time, 'latencies': some_time_latencies},]
+                              {'name': some_time, 'latencies': some_time_latencies}]
         self.assertDictEqual({'time': result_time_metris, 'count': [], 'gauge': []},
                              self.a_metrics_cache._build_metrics_from_cache_response(time_metrics))
 
-    def test_returns_count_metrics(self):
+    def test_returns_gauge_metrics(self):
         """Test that _build_metrics_from_cache_response returns gauge metrics"""
         some_gauge = 'some_gauge'
         some_gauge_value = mock.MagicMock()
@@ -579,4 +556,3 @@ class RedisMetricsCacheBuildMetricsFromCacheResponseTests(TestCase):
                                 {'name': some_other_gauge, 'value': some_other_gauge_value}]
         self.assertDictEqual({'time': [], 'count': [], 'gauge': result_gauge_metrics},
                              self.a_metrics_cache._build_metrics_from_cache_response(gauge_metrics))
-

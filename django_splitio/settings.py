@@ -4,8 +4,6 @@ import importlib
 
 from django.conf import settings
 
-from redis import StrictRedis
-
 from splitio.settings import DEFAULT_CONFIG, SDK_API_BASE_URL, EVENTS_API_BASE_URL
 
 

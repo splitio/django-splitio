@@ -4,14 +4,13 @@ import logging
 
 from splitio.metrics import AsyncMetrics, CacheBasedMetrics
 
-from .api import sdk_api
 from .cache import metrics_cache
 
 
 _logger = logging.getLogger(__name__)
 
 
-def report_metrics(a_metrics_cache):
+def report_metrics(a_metrics_cache, an_sdk_api):
     """If the reporting process is enabled (through the metrics cache), this function collects
     the time, count and gauge from the cache and sends them to Split through the events API. If the
     process fails, no exceptions are raised (but they are logged) and the process is disabled."""
@@ -23,15 +22,15 @@ def report_metrics(a_metrics_cache):
 
         if 'time' in metrics and len(metrics['time']) > 0:
             _logger.info('Sending times metrics...')
-            sdk_api.metrics_times(metrics['time'])
+            an_sdk_api.metrics_times(metrics['time'])
 
         if 'count' in metrics and len(metrics['count']) > 0:
             _logger.info('Sending counters metrics...')
-            sdk_api.metrics_counters(metrics['count'])
+            an_sdk_api.metrics_counters(metrics['count'])
 
         if 'gauge' in metrics and len(metrics['gauge']) > 0:
             _logger.info('Sending gauge metrics...')
-            sdk_api.metrics_gauge(metrics['gauge'])
+            an_sdk_api.metrics_gauge(metrics['gauge'])
     except:
         _logger.exception('Exception caught reporting metrics')
         a_metrics_cache.disable()

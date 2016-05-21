@@ -34,7 +34,7 @@ class SplitioSettingsDjangoSettingsTests(TestCase, MockUtilsMixin):
         self.assertEqual(settings.SPLITIO['SPLIT_SDK_MACHINE_NAME'],
                          splitio_settings.SPLIT_SDK_MACHINE_NAME)
 
-    def test_settings_split_sdk_machine_name_is_used(self):
+    def test_settings_split_sdk_machine_ip_is_used(self):
         """Test that splitio_settings.SPLIT_SDK_MACHINE_IP is taken from Django settings"""
         self.assertEqual(settings.SPLITIO['SPLIT_SDK_MACHINE_IP'],
                          splitio_settings.SPLIT_SDK_MACHINE_IP)
@@ -73,19 +73,19 @@ class SplitioSettingsUserSettingsTests(TestCase, MockUtilsMixin):
         self.some_user_settings.__getitem__.return_value = some_sdk_api_base_url
         self.assertEqual(some_sdk_api_base_url, self.a_split_settings.SDK_API_BASE_URL)
 
-    def test_user_settings_sdk_api_base_url_used(self):
+    def test_user_settings_events_api_base_url_used(self):
         """Test that split_settings uses the user supplied EVENTS_API_BASE_URL value"""
         some_events_api_base_url = mock.MagicMock()
         self.some_user_settings.__getitem__.return_value = some_events_api_base_url
         self.assertEqual(some_events_api_base_url, self.a_split_settings.EVENTS_API_BASE_URL)
 
-    def test_user_settings_sdk_api_base_url_used(self):
+    def test_user_settings_split_sdk_machine_name_used(self):
         """Test that split_settings uses the user supplied SPLIT_SDK_MACHINE_NAME value"""
         some_split_sdk_machine_name = mock.MagicMock()
         self.some_user_settings.__getitem__.return_value = some_split_sdk_machine_name
         self.assertEqual(some_split_sdk_machine_name, self.a_split_settings.SPLIT_SDK_MACHINE_NAME)
 
-    def test_user_settings_sdk_api_base_url_used(self):
+    def test_user_settings_split_sdk_machine_ip_used(self):
         """Test that split_settings uses the user supplied SPLIT_SDK_MACHINE_IP value"""
         some_split_sdk_machine_ip = mock.MagicMock()
         self.some_user_settings.__getitem__.return_value = some_split_sdk_machine_ip
@@ -123,16 +123,16 @@ class SplitioSettingsUserSettingsDefaultsTests(TestCase, MockUtilsMixin):
         """Test that split_settings uses the default SDK_API_BASE_URL value"""
         self.assertEqual(DEFAULTS['SDK_API_BASE_URL'], self.a_split_settings.SDK_API_BASE_URL)
 
-    def test_user_settings_sdk_api_base_url_used(self):
+    def test_user_settings_events_api_base_url_used(self):
         """Test that split_settings uses the default EVENTS_API_BASE_URL value"""
         self.assertEqual(DEFAULTS['EVENTS_API_BASE_URL'], self.a_split_settings.EVENTS_API_BASE_URL)
 
-    def test_user_settings_sdk_api_base_url_used(self):
+    def test_user_settings_sdk_api_machine_name_used(self):
         """Test that split_settings uses the default SPLIT_SDK_MACHINE_NAME value"""
         self.assertEqual(DEFAULTS['SPLIT_SDK_MACHINE_NAME'],
                          self.a_split_settings.SPLIT_SDK_MACHINE_NAME)
 
-    def test_user_settings_sdk_api_base_url_used(self):
+    def test_user_settings_sdk_api_machine_ip_used(self):
         """Test that split_settings uses the default SPLIT_SDK_MACHINE_IP value"""
         self.assertEqual(DEFAULTS['SPLIT_SDK_MACHINE_IP'],
                          self.a_split_settings.SPLIT_SDK_MACHINE_IP)
