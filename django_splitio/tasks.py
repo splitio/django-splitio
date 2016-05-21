@@ -5,6 +5,7 @@ from datetime import timedelta
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
+from .api import sdk_api
 from .features import (update_segments, update_splits, segment_change_fetcher, split_change_fetcher,
                        split_parser)
 from .cache import segment_cache, split_cache, impressions_cache, metrics_cache
@@ -66,7 +67,7 @@ def update_segments_task():
 @shared_task(name='django_splitio.tasks.update_impressions_task', ignore_result=True)
 def update_impressions_task():
     try:
-        report_impressions(impressions_cache)
+        report_impressions(impressions_cache, sdk_api)
     except:
         logger.exception('Exception caught running impressions update task')
 
@@ -74,6 +75,6 @@ def update_impressions_task():
 @shared_task(name='django_splitio.tasks.update_metrics_task', ignore_result=True)
 def update_metrics_task():
     try:
-        report_metrics(metrics_cache)
+        report_metrics(metrics_cache, sdk_api)
     except:
         logger.exception('Exception caught running metrics update task')
