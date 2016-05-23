@@ -5,10 +5,11 @@ from datetime import timedelta
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .api import sdk_api
-from .features import (update_segments, update_splits, segment_change_fetcher, split_change_fetcher,
-                       split_parser)
-from .cache import segment_cache, split_cache, impressions_cache, metrics_cache
+from splitio.segments import ApiSegmentChangeFetcher
+from splitio.splits import ApiSplitChangeFetcher
+
+from .features import (update_segments, update_splits, RedisSplitParser, RedisSegmentFetcher)
+from .cache import RedisSplitCache, RedisSegmentCache, RedisImpressionsCache, RedisMetricsCache
 from .impressions import report_impressions
 from .metrics import report_metrics
 from .settings import splitio_settings
@@ -51,6 +52,13 @@ def get_metrics_update_schedule():
 @shared_task(name='django_splitio.tasks.update_features_task', ignore_result=True)
 def update_features_task():
     try:
+        redis = splitio_settings.redis_factory()
+        split_cache = RedisSplitCache(redis)
+        sdk_api = splitio_settings.api_factory()
+        split_change_fetcher = ApiSplitChangeFetcher(sdk_api)
+        segment_cache = RedisSegmentCache(redis)
+        segment_fetcher = RedisSegmentFetcher(segment_cache)
+        split_parser = RedisSplitParser(segment_fetcher, segment_cache)
         update_splits(split_cache, split_change_fetcher, split_parser)
     except:
         logger.exception('Exception caught running features update task')
@@ -59,6 +67,10 @@ def update_features_task():
 @shared_task(name='django_splitio.tasks.update_segments_task', ignore_result=True)
 def update_segments_task():
     try:
+        redis = splitio_settings.redis_factory()
+        segment_cache = RedisSegmentCache(redis)
+        sdk_api = splitio_settings.api_factory()
+        segment_change_fetcher = ApiSegmentChangeFetcher(sdk_api)
         update_segments(segment_cache, segment_change_fetcher)
     except:
         logger.exception('Exception caught running segment definitions update task')
@@ -67,6 +79,9 @@ def update_segments_task():
 @shared_task(name='django_splitio.tasks.update_impressions_task', ignore_result=True)
 def update_impressions_task():
     try:
+        redis = splitio_settings.redis_factory()
+        impressions_cache = RedisImpressionsCache(redis)
+        sdk_api = splitio_settings.api_factory()
         report_impressions(impressions_cache, sdk_api)
     except:
         logger.exception('Exception caught running impressions update task')
@@ -75,6 +90,9 @@ def update_impressions_task():
 @shared_task(name='django_splitio.tasks.update_metrics_task', ignore_result=True)
 def update_metrics_task():
     try:
+        redis = splitio_settings.redis_factory()
+        metrics_cache = RedisMetricsCache(redis)
+        sdk_api = splitio_settings.api_factory()
         report_metrics(metrics_cache, sdk_api)
     except:
         logger.exception('Exception caught running metrics update task')

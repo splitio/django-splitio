@@ -1,17 +1,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from splitio.clients import Client
+from splitio.clients import Client, LocalhostEnvironmentClient
 
-from .features import split_fetcher
-from .impressions import treatment_log
-from .metrics import metrics
+from splitio.impressions import AsyncTreatmentLog, CacheBasedTreatmentLog
+from splitio.metrics import AsyncMetrics, CacheBasedMetrics
+from splitio.splits import CacheBasedSplitFetcher
+
+from .cache import RedisSplitCache, RedisImpressionsCache, RedisMetricsCache
+from .settings import splitio_settings
 
 
-class DjangoCacheClient(Client):
+class DjangoClient(Client):
     def __init__(self, a_split_fetcher, a_treatment_log, a_metrics):
         """A Client implementation that uses Django specific versions of split fetcher, treatment
         log and metrics."""
-        super(DjangoCacheClient, self).__init__()
+        super(DjangoClient, self).__init__()
         self._split_fetcher = a_split_fetcher
         self._treatment_log = a_treatment_log
         self._metrics = a_metrics
@@ -40,4 +43,33 @@ class DjangoCacheClient(Client):
         """
         return self._metrics
 
-client = DjangoCacheClient(split_fetcher, treatment_log, metrics)
+
+def django_client_factory():
+    """Returns a Django/Redis based split.io client implementation using the configuration given
+    in the SPLITIO section of the Django settings.
+    :return: A Django/Redis split.io client
+    :rtype: DjangoClient
+    """
+    redis = splitio_settings.redis_factory()
+
+    split_cache = RedisSplitCache(redis)
+    split_fetcher = CacheBasedSplitFetcher(split_cache)
+
+    impressions_cache = RedisImpressionsCache(splitio_settings.redis_factory())
+    delegate_treatment_log = CacheBasedTreatmentLog(impressions_cache)
+    treatment_log = AsyncTreatmentLog(delegate_treatment_log)
+
+    metrics_cache = RedisMetricsCache(redis)
+    delegate_metrics = CacheBasedMetrics(metrics_cache)
+    metrics = AsyncMetrics(delegate_metrics)
+
+    return DjangoClient(split_fetcher, treatment_log, metrics)
+
+
+def localhost_client_factory():
+    """Returns a split.io client implementation that builds its configuration from a split
+    definition file
+    :return: A localhost environment split.io client.
+    :rtype: LocalhostEnvironmentClient
+    """
+    return LocalhostEnvironmentClient()

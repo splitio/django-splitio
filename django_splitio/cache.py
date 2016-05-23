@@ -12,9 +12,6 @@ from six import iteritems
 from splitio.cache import SegmentCache, SplitCache, ImpressionsCache, MetricsCache
 from splitio.metrics import BUCKETS
 
-from .settings import splitio_settings
-
-
 # Template for Split.io related Django Cache keys
 _SPLITIO_CACHE_KEY_TEMPLATE = 'SPLITIO.{suffix}'
 
@@ -482,9 +479,3 @@ def default_redis_factory():
     """
     redis = StrictRedis(host='localhost', port=6379, db=0)
     return redis
-
-
-segment_cache = RedisSegmentCache(splitio_settings.redis_factory())
-split_cache = RedisSplitCache(splitio_settings.redis_factory())
-impressions_cache = RedisImpressionsCache(splitio_settings.redis_factory())
-metrics_cache = RedisMetricsCache(splitio_settings.redis_factory())

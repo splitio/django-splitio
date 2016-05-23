@@ -1,8 +1,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from django import template
-from django_splitio.clients import client
 
+from .. import get_client
+
+
+client = get_client()
 register = template.Library()
 
 

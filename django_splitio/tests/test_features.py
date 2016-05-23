@@ -12,7 +12,6 @@ from django.test import TestCase
 
 from splitio.tests.utils import MockUtilsMixin
 
-from django_splitio.cache import segment_cache
 from django_splitio.features import (update_segments, update_segment, RedisSplitParser,
                                      update_splits, RedisBasedSegment, RedisSegmentFetcher)
 
@@ -243,10 +242,12 @@ class UpdateSplitsTests(TestCase, MockUtilsMixin):
         self.some_split_cache.disable.assert_called_once_with()
 
 
-class RedisBasedSegmentTests(TestCase):
+class RedisBasedSegmentTests(TestCase, MockUtilsMixin):
     def setUp(self):
+        self.redis_segment_cache_mock = self.patch('django_splitio.features.RedisSegmentCache')
         self.some_name = 'some_name'
         self.segment = RedisBasedSegment(self.some_name)
+        self.redis_segment_cache_mock.reset()
 
     def test_is_possible_to_pickle(self):
         """Test that is possible to pickle a RedisBasedSegment"""
@@ -259,7 +260,8 @@ class RedisBasedSegmentTests(TestCase):
         """Test that segment_cache is set on the RedisBasedSegment objects when unpickled"""
         pickled_segment = pickle.dumps(self.segment)
         unpickled_segment = pickle.loads(pickled_segment)
-        self.assertEqual(segment_cache, unpickled_segment._segment_cache)
+        self.assertEqual(self.redis_segment_cache_mock.return_value,
+                         unpickled_segment._segment_cache)
 
 
 class RedisSegmentFetcherTests(TestCase, MockUtilsMixin):

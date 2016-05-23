@@ -5,8 +5,9 @@ from splitio.api import SdkApi
 from .settings import splitio_settings
 
 
-def _build_sdk_api():
-    """Build SDK API client
+def api_factory():
+    """Build a split.io SDK API client according to the configuration given in the SPLITIO section
+    of the Django settings.
     :return: SdkApi client
     :rtype: SdkApi
     """
@@ -17,4 +18,3 @@ def _build_sdk_api():
                   split_sdk_machine_ip=splitio_settings.SPLIT_SDK_MACHINE_IP,
                   connect_timeout=splitio_settings.CONFIG['connectionTimeout'],
                   read_timeout=splitio_settings.CONFIG['readTimeout'])
-sdk_api = _build_sdk_api()

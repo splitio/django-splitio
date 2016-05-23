@@ -13,7 +13,9 @@ DEFAULTS = {
     'EVENTS_API_BASE_URL': EVENTS_API_BASE_URL,
     'SPLIT_SDK_MACHINE_NAME': None,
     'SPLIT_SDK_MACHINE_IP': None,
+    'API_FACTORY': 'django_splitio.api.api_factory',
     'REDIS_FACTORY': 'django_splitio.cache.default_redis_factory',
+    'CLIENT_FACTORY': 'django_splitio.clients.django_client_factory',
     'CONFIG': DEFAULT_CONFIG
 }
 
@@ -37,10 +39,22 @@ class SplitioSettings(object):
         self.defaults = defaults if defaults is not None else DEFAULTS
 
     @property
+    def api_factory(self):
+        if not hasattr(self, '_api_factory'):
+            self._api_factory = import_from_string(self.API_FACTORY, 'API_FACTORY')
+        return self._api_factory
+
+    @property
     def redis_factory(self):
         if not hasattr(self, '_redis_factory'):
             self._redis_factory = import_from_string(self.REDIS_FACTORY, 'REDIS_FACTORY')
         return self._redis_factory
+
+    @property
+    def client_factory(self):
+        if not hasattr(self, '_client_factory'):
+            self._client_factory = import_from_string(self.CLIENT_FACTORY, 'CLIENT_FACTORY')
+        return self._client_factory
 
     @property
     def user_settings(self):
