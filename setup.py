@@ -19,7 +19,7 @@ setup(name='django-splitio',
       install_requires=install_requires,
       tests_require=tests_require,
       extras_require={'test': tests_require},
-      setup_requires=['flake8'],
+      setup_requires=['flake8', 'coverage'],
       test_suite='django_splitio.runtests.runtests',
       classifiers=[
           'Development Status :: 2 - Pre-Alpha',
