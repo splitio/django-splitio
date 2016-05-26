@@ -121,7 +121,7 @@ class RedisSplitCacheTests(TestCase, MockUtilsMixin):
     def test_disable_sets_disabled_key(self):
         """Test that disable sets the disabled key for splits"""
         self.a_split_cache.disable()
-        self.some_redis.set.assert_called_once_with('SPLITIO.splits.__disabled__', 1)
+        self.some_redis.setex.assert_called_once_with('SPLITIO.splits.__disabled__', 1, 3600)
 
     def test_enable_deletes_disabled_key(self):
         """Test that enable deletes the disabled key for splits"""
@@ -196,7 +196,7 @@ class RedisImpressionsCacheTests(TestCase, MockUtilsMixin):
     def test_disable_sets_disabled_key(self):
         """Test that disable sets the disabled key for impressions"""
         self.an_impressions_cache.disable()
-        self.some_redis.set.assert_called_once_with('SPLITIO.impressions.__disabled__', 1)
+        self.some_redis.setex.assert_called_once_with('SPLITIO.impressions.__disabled__', 1, 3600)
 
     def test_enable_deletes_disabled_key(self):
         """Test that enable deletes the disabled key for impressions"""
@@ -320,7 +320,7 @@ class RedisMetricsCacheTests(TestCase, MockUtilsMixin):
     def test_disable_sets_disabled_key(self):
         """Test that disable sets the disabled key for metrics"""
         self.a_metrics_cache.disable()
-        self.some_redis.set.assert_called_once_with('SPLITIO.metrics.__disabled__', 1)
+        self.some_redis.setex.assert_called_once_with('SPLITIO.metrics.__disabled__', 1, 3600)
 
     def test_enable_deletes_disabled_key(self):
         """Test that enable deletes the disabled key for metrics"""

@@ -128,9 +128,9 @@ class RedisSplitCache(SplitCache):
         return RedisSplitCache._KEY_TEMPLATE.format(suffix=split_name)
 
     def disable(self):
-        """Disables the automatic split update process. This method will be called if there's an
-        exception while updating the splits."""
-        self._redis.set(RedisSplitCache._DISABLED_KEY, 1)
+        """Disables the automatic split update process for an hour. This method will be called if
+        there's an exception while updating the splits."""
+        self._redis.setex(RedisSplitCache._DISABLED_KEY, 1, 3600)
 
     def enable(self):
         """Enables the automatic split update process."""
@@ -182,9 +182,9 @@ class RedisImpressionsCache(ImpressionsCache):
 
     def disable(self):
         """Disables the automatic impressions report process and the registration of any
-        impressions. This method will be called if there's an exception while trying to send the
-        impressions back to Split."""
-        self._redis.set(RedisImpressionsCache._DISABLED_KEY, 1)
+        impressions for an hour. This method will be called if there's an exception while trying to
+        send the impressions back to Split."""
+        self._redis.setex(RedisImpressionsCache._DISABLED_KEY, 1, 3600)
 
     def is_enabled(self):
         """
@@ -285,9 +285,9 @@ class RedisMetricsCache(MetricsCache):
 
     def disable(self):
         """Disables the automatic metrics report process and the registration of any
-        metrics. This method will be called if there's an exception while trying to send the
-        metrics back to Split."""
-        self._redis.set(RedisMetricsCache._DISABLED_KEY, 1)
+        metrics for an hour. This method will be called if there's an exception while trying to
+        send the metrics back to Split."""
+        self._redis.setex(RedisMetricsCache._DISABLED_KEY, 1, 3600)
 
     def is_enabled(self):
         """
