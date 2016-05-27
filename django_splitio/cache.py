@@ -23,17 +23,28 @@ class RedisSegmentCache(SegmentCache):
     _SEGMENT_CHANGE_NUMBER_KEY_TEMPLATE = _KEY_TEMPLATE.format(
         suffix='segment.{segment_name}.change_number')
 
-    def __init__(self, redis):
+    def __init__(self, redis, disabled_period=300):
         """A Segment Cache implementation that uses Redis as its back-end
         :param redis: The redis client
         :rtype redis: StringRedis
+        :param disabled_period: The expiration period for the disabled key.
+        :param disabled_period: int
         """
         self._redis = redis
+        self._disabled_period = disabled_period
+
+    @property
+    def disabled_period(self):
+        return self._disabled_period
+
+    @disabled_period.setter
+    def disabled_period(self, disabled_period):
+        self._disabled_period = disabled_period
 
     def disable(self):
         """Disables the automatic update process. This method will be called if the update fails
         for some reason. Use enable to re-enable the update process."""
-        self._redis.set(RedisSegmentCache._DISABLED_KEY, 1)
+        self._redis.setex(RedisSegmentCache._DISABLED_KEY, 1, self._disabled_period)
 
     def enable(self):
         """Enables the automatic update process."""
@@ -111,12 +122,23 @@ class RedisSplitCache(SplitCache):
     _KEY_TEMPLATE = _SPLITIO_CACHE_KEY_TEMPLATE.format(suffix='splits.{suffix}')
     _DISABLED_KEY = _KEY_TEMPLATE.format(suffix='__disabled__')
 
-    def __init__(self, redis):
+    def __init__(self, redis, disabled_period=300):
         """A SplitCache implementation that uses Redis as its back-end.
         :param redis: The redis client
         :type redis: StrictRedis
+        :param disabled_period: The expiration period for the disabled key.
+        :param disabled_period: int
         """
         self._redis = redis
+        self._disabled_period = disabled_period
+
+    @property
+    def disabled_period(self):
+        return self._disabled_period
+
+    @disabled_period.setter
+    def disabled_period(self, disabled_period):
+        self._disabled_period = disabled_period
 
     def _get_split_key(self, split_name):
         """Builds a Redis key cache for a given split (feature) name,
@@ -128,9 +150,9 @@ class RedisSplitCache(SplitCache):
         return RedisSplitCache._KEY_TEMPLATE.format(suffix=split_name)
 
     def disable(self):
-        """Disables the automatic split update process for an hour. This method will be called if
-        there's an exception while updating the splits."""
-        self._redis.setex(RedisSplitCache._DISABLED_KEY, 1, 3600)
+        """Disables the automatic split update process for the specified disabled period. This
+        method will be called if there's an exception while updating the splits."""
+        self._redis.setex(RedisSplitCache._DISABLED_KEY, 1, self._disabled_period)
 
     def enable(self):
         """Enables the automatic split update process."""
@@ -169,12 +191,23 @@ class RedisImpressionsCache(ImpressionsCache):
     _IMPRESSIONS_TO_CLEAR_KEY = _KEY_TEMPLATE.format(suffix='impressions_to_clear')
     _DISABLED_KEY = _KEY_TEMPLATE.format(suffix='__disabled__')
 
-    def __init__(self, redis):
+    def __init__(self, redis, disabled_period=300):
         """An ImpressionsCache implementation that uses Redis as its back-end
         :param redis: The redis client
         :type redis: StrictRedis
+        :param disabled_period: The expiration period for the disabled key.
+        :param disabled_period: int
         """
         self._redis = redis
+        self._disabled_period = disabled_period
+
+    @property
+    def disabled_period(self):
+        return self._disabled_period
+
+    @disabled_period.setter
+    def disabled_period(self, disabled_period):
+        self._disabled_period = disabled_period
 
     def enable(self):
         """Enables the automatic impressions report process and the registration of impressions."""
@@ -182,9 +215,9 @@ class RedisImpressionsCache(ImpressionsCache):
 
     def disable(self):
         """Disables the automatic impressions report process and the registration of any
-        impressions for an hour. This method will be called if there's an exception while trying to
-        send the impressions back to Split."""
-        self._redis.setex(RedisImpressionsCache._DISABLED_KEY, 1, 3600)
+        impressions for the specificed disabled period. This method will be called if there's an
+        exception while trying to send the impressions back to Split."""
+        self._redis.setex(RedisImpressionsCache._DISABLED_KEY, 1, self._disabled_period)
 
     def is_enabled(self):
         """
@@ -271,13 +304,24 @@ class RedisMetricsCache(MetricsCache):
     _CONDITIONAL_EVAL_SCRIPT_TEMPLATE = "if redis.call('EXISTS', '{disabled_key}') == 0 " \
                                         "then {script} end"
 
-    def __init__(self, redis):
+    def __init__(self, redis, disabled_period=300):
         """A MetricsCache implementation that uses Redis as its back-end
         :param redis: The redis client
         :type redis: StrictRedis
+        :param disabled_period: The expiration period for the disabled key.
+        :param disabled_period: int
         """
         super(RedisMetricsCache, self).__init__()
         self._redis = redis
+        self._disabled_period = disabled_period
+
+    @property
+    def disabled_period(self):
+        return self._disabled_period
+
+    @disabled_period.setter
+    def disabled_period(self, disabled_period):
+        self._disabled_period = disabled_period
 
     def enable(self):
         """Enables the automatic metrics report process and the registration of new metrics."""
@@ -285,9 +329,9 @@ class RedisMetricsCache(MetricsCache):
 
     def disable(self):
         """Disables the automatic metrics report process and the registration of any
-        metrics for an hour. This method will be called if there's an exception while trying to
-        send the metrics back to Split."""
-        self._redis.setex(RedisMetricsCache._DISABLED_KEY, 1, 3600)
+        metrics for the specified disabled period. This method will be called if there's an
+        exception while trying to send the metrics back to Split."""
+        self._redis.setex(RedisMetricsCache._DISABLED_KEY, 1, self._disabled_period)
 
     def is_enabled(self):
         """

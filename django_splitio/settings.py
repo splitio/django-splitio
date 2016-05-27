@@ -16,6 +16,7 @@ DEFAULTS = {
     'API_FACTORY': 'django_splitio.api.api_factory',
     'REDIS_FACTORY': 'django_splitio.cache.default_redis_factory',
     'CLIENT_FACTORY': 'django_splitio.clients.django_client_factory',
+    'DISABLED_PERIOD': 60 * 5,
     'CONFIG': DEFAULT_CONFIG
 }
 

@@ -31,6 +31,7 @@ SPLITIO = {
     'SPLIT_SDK_MACHINE_NAME': mock.MagicMock(),
     'SPLIT_SDK_MACHINE_IP': mock.MagicMock(),
     'REDIS_FACTORY': 'django_splitio.tests.utils.mock_redis_factory',
+    'DISABLED_PERIOD': mock.MagicMock(),
     'CONFIG': {
         'connectionTimeout': mock.MagicMock(),
         'readTimeout': mock.MagicMock(),

@@ -39,6 +39,11 @@ class SplitioSettingsDjangoSettingsTests(TestCase, MockUtilsMixin):
         self.assertEqual(settings.SPLITIO['SPLIT_SDK_MACHINE_IP'],
                          splitio_settings.SPLIT_SDK_MACHINE_IP)
 
+    def test_settings_disabled_period_used(self):
+        """Test that splitio_settings.DISABLED_PERIOD is taken from Django settings"""
+        self.assertEqual(settings.SPLITIO['DISABLED_PERIOD'],
+                         splitio_settings.DISABLED_PERIOD)
+
     def test_redis_factory_is_used(self):
         """Test that splitio_settings.redis_factory is taken from Django settings"""
         self.assertEqual(redis, splitio_settings.redis_factory())
@@ -91,6 +96,12 @@ class SplitioSettingsUserSettingsTests(TestCase, MockUtilsMixin):
         self.some_user_settings.__getitem__.return_value = some_split_sdk_machine_ip
         self.assertEqual(some_split_sdk_machine_ip, self.a_split_settings.SPLIT_SDK_MACHINE_IP)
 
+    def test_user_settings_disabled_period_used(self):
+        """Test that split_settings uses the user supplied DISABLED_PERIOD value"""
+        some_disabled_period = mock.MagicMock()
+        self.some_user_settings.__getitem__.return_value = some_disabled_period
+        self.assertEqual(some_disabled_period, self.a_split_settings.DISABLED_PERIOD)
+
     def test_redis_factory_is_used(self):
         """Test that splitio_settings.redis_factory is taken from the user settings"""
         self.some_user_settings.__getitem__.return_value = \
@@ -136,6 +147,11 @@ class SplitioSettingsUserSettingsDefaultsTests(TestCase, MockUtilsMixin):
         """Test that split_settings uses the default SPLIT_SDK_MACHINE_IP value"""
         self.assertEqual(DEFAULTS['SPLIT_SDK_MACHINE_IP'],
                          self.a_split_settings.SPLIT_SDK_MACHINE_IP)
+
+    def test_user_settings_disabled_period_used(self):
+        """Test that split_settings uses the default DISABLED_PERIOD value"""
+        self.assertEqual(DEFAULTS['DISABLED_PERIOD'],
+                         self.a_split_settings.DISABLED_PERIOD)
 
     def test_redis_factory_is_used(self):
         """Test that splitio_settings.redis_factory is taken from default value"""
