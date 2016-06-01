@@ -4,6 +4,7 @@ import pickle
 import re
 
 from collections import defaultdict
+from django.conf import settings
 from itertools import groupby, islice, izip
 
 from redis import StrictRedis
@@ -521,5 +522,8 @@ def default_redis_factory():
     :return: A StrictRedis object using the provided config values
     :rtype: StrictRedis
     """
-    redis = StrictRedis(host='localhost', port=6379, db=0)
+    host = settings.SPLITIO.get('REDIS_HOST', 'localhost') or 'localhost'
+    port = settings.SPLITIO.get('REDIS_PORT', 6379) or 6379
+    db = settings.SPLITIO.get('REDIS_PORT', 0) or 0
+    redis = StrictRedis(host=host, port=port, db=db)
     return redis
