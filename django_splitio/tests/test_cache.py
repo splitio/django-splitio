@@ -97,8 +97,10 @@ class RedisSegmentCacheTests(TestCase):
 
     def test_get_change_number_gets_segment_change_number_key(self):
         """Test that get_change_number gets the segment's change number key"""
-        self.assertEqual(self.some_redis.get.return_value,
-                         self.a_segment_cache.get_change_number(self.some_segment_name_str))
+        self.some_redis.get.return_value = '1234'
+        result = self.a_segment_cache.get_change_number(self.some_segment_name_str)
+        self.assertEqual(int(self.some_redis.get.return_value), result)
+        self.assertIsInstance(result, int)
         self.some_redis.get.assert_called_once_with(
             'SPLITIO.segments.segment.some_segment_name.change_number')
 
@@ -150,8 +152,10 @@ class RedisSplitCacheTests(TestCase, MockUtilsMixin):
 
     def test_get_change_number_gets_segment_change_number_key(self):
         """Test that get_change_number gets the change number key"""
-        self.assertEqual(self.some_redis.get.return_value,
-                         self.a_split_cache.get_change_number())
+        self.some_redis.get.return_value = '1234'
+        result = self.a_split_cache.get_change_number()
+        self.assertEqual(int(self.some_redis.get.return_value), result)
+        self.assertIsInstance(result, int)
         self.some_redis.get.assert_called_once_with(
             'SPLITIO.splits.__change_number__')
 

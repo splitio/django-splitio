@@ -88,9 +88,12 @@ def update_splits(split_cache, split_change_fetcher, split_parser):
             response = split_change_fetcher.fetch(till)
 
             if till >= response['till']:
+                _logger.debug("change_number is greater or equal than 'till'")
                 return
 
             if 'splits' in response and len(response['splits']) > 0:
+                _logger.debug("Missing or empty 'splits' field in response. response = %s",
+                              response)
                 added_features = []
                 removed_features = []
 
