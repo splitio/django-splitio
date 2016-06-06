@@ -6,7 +6,7 @@ This project provides `Django <https://www.djangoproject.com/>`_ sites access to
 Installation and Requirements
 -----------------------------
 
-`django-splitio` supports both Python 2 (2.7 or later) and Python 3 (3.3 or later) and Django 1.8 (or later). Stable versions can be installed from `PyPI <https://pypi.python.org>`_ using pip: ::
+``django-splitio`` supports both Python 2 (2.7 or later) and Python 3 (3.3 or later) and Django 1.8 (or later). Stable versions can be installed from `PyPI <https://pypi.python.org>`_ using pip: ::
 
   pip install django-splitio
 
@@ -29,7 +29,7 @@ First add ``django_splitio`` to the ``INSTALLED_APPS`` Django setting: ::
         ...
     )
 
-Next, create a `SPLITIO` dictionary on the Django settings. Only the `API_KEY` is mandatory. ::
+Next, create a ``SPLITIO`` dictionary on the Django settings. Only the ``API_KEY`` is mandatory. ::
 
     SPLITIO = {
         'API_KEY': 'my_splitio_api_key',
