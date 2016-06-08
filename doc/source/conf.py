@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-splitio'
+project = u'django_splitio'
 copyright = u'2016, Patricio Echague'
 author = u'Patricio Echague'
 
@@ -263,7 +263,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'django-splitio.tex', u'django-splitio Documentation',
+    (master_doc, 'django_splitio.tex', u'django_splitio Documentation',
      u'Patricio Echague', 'manual'),
 ]
 
@@ -299,7 +299,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'django-splitio', u'django-splitio Documentation',
+    (master_doc, 'django_splitio', u'django_splitio Documentation',
      [author], 1)
 ]
 
@@ -314,8 +314,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'django-splitio', u'django-splitio Documentation',
-     author, 'django-splitio', 'One line description of project.',
+    (master_doc, 'django_splitio', u'django_splitio Documentation',
+     author, 'django_splitio', 'One line description of project.',
      'Miscellaneous'),
 ]
 

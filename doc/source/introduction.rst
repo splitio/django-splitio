@@ -6,13 +6,13 @@ This project provides `Django <https://www.djangoproject.com/>`_ sites access to
 Installation and Requirements
 -----------------------------
 
-``django-splitio`` supports both Python 2 (2.7 or later) and Python 3 (3.3 or later) and Django 1.8 (or later). Stable versions can be installed from `PyPI <https://pypi.python.org>`_ using pip: ::
+``django_splitio`` supports both Python 2 (2.7 or later) and Python 3 (3.3 or later) and Django 1.8 (or later). Stable versions can be installed from `PyPI <https://pypi.python.org>`_ using pip: ::
 
   pip install django-splitio
 
 and development versions are installed directly from the `Github <https://github.com/splitio/django-splitio>`_ repository: ::
 
-  pip install -e git+git@github.com:splitio/django-splitio.git@development#egg=django-splitio
+  pip install -e git+git@github.com:splitio/django-splitio.git@development#egg=django_splitio
 
 This project requires a working `Celery <http://www.celeryproject.org/>`_ setup `integrated into your Django site <http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html>_` and access to a `Redis <http://redis.io/>`_ 2.6 (or later) instance.
 

@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 
+from os import path
 from setuptools import setup
 from sys import version_info
 
 tests_require = ['Django>=1.8']
-install_requires = ['splitio-client>=0.0.1', 'redis>=2.10']
+install_requires = ['splitio_client>=0.0.1', 'redis>=2.10']
 
 if version_info < (3,):
     tests_require += ['mock']
 
-setup(name='django-splitio',
+with open(path.join(path.abspath(path.dirname(__file__)), 'django_splitio', 'version.py')) as f:
+    exec (f.read())
+
+setup(name='django_splitio',
       version='0.0.1',
       description='Split.io Django Application',
       author='Patricio Echague',

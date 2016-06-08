@@ -73,3 +73,13 @@ def localhost_client_factory():
     :rtype: LocalhostEnvironmentClient
     """
     return LocalhostEnvironmentClient()
+
+
+
+def get_client():
+    """Returns a split.io client implementation based on the configuration given on the Django
+    settings.
+    :return: A split.io client implementation
+    :rtype: Client
+    """
+    return splitio_settings.client_factory()
