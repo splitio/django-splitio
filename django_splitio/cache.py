@@ -5,7 +5,8 @@ import re
 
 from collections import defaultdict
 from django.conf import settings
-from itertools import groupby, islice, izip
+from builtins import zip
+from itertools import groupby, islice
 
 from redis import StrictRedis
 from six import iteritems
@@ -443,7 +444,7 @@ class RedisMetricsCache(MetricsCache):
         count = dict()
         gauge = dict()
 
-        for field, value in izip(islice(response, 0, None, 2), islice(response, 1, None, 2)):
+        for field, value in zip(islice(response, 0, None, 2), islice(response, 1, None, 2)):
             count_match = RedisMetricsCache._COUNT_FIELD_RE.match(field)
             if count_match is not None:
                 count[count_match.group('counter')] = value
