@@ -18,8 +18,6 @@ from django_splitio.features import (update_segments, update_segment, RedisSplit
 
 class UpdateSegmentsTests(TestCase, MockUtilsMixin):
     def setUp(self):
-        if False:
-            self.some_segments_cache = mock.MagicMock()
         self.some_segments_cache = mock.MagicMock()
         self.some_segments_cache.is_enabled.return_value = True
         self.some_segment_change_fetcher = mock.MagicMock()
