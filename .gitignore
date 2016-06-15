@@ -61,5 +61,9 @@ target/
 # Ipython Notebook
 .ipynb_checkpoints
 
+# Sonar
+.sonar/
+
+
 # PyCharm
 .idea
