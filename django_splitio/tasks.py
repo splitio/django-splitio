@@ -7,11 +7,9 @@ from celery.utils.log import get_task_logger
 
 from splitio.segments import ApiSegmentChangeFetcher
 from splitio.splits import ApiSplitChangeFetcher
-
-from .features import (update_segments, update_splits, RedisSplitParser, RedisSegmentFetcher)
-from .cache import RedisSplitCache, RedisSegmentCache, RedisImpressionsCache, RedisMetricsCache
-from .impressions import report_impressions
-from .metrics import report_metrics
+from splitio.redis_support import (RedisSplitCache, RedisSegmentCache, RedisImpressionsCache,
+                                   RedisMetricsCache, RedisSplitParser)
+from splitio.tasks import (update_segments, update_splits, report_impressions, report_metrics)
 from .settings import splitio_settings
 
 logger = get_task_logger(__name__)
@@ -57,8 +55,7 @@ def update_features_task():
         sdk_api = splitio_settings.api_factory()
         split_change_fetcher = ApiSplitChangeFetcher(sdk_api)
         segment_cache = RedisSegmentCache(redis)
-        segment_fetcher = RedisSegmentFetcher(segment_cache)
-        split_parser = RedisSplitParser(segment_fetcher, segment_cache)
+        split_parser = RedisSplitParser(segment_cache)
         update_splits(split_cache, split_change_fetcher, split_parser)
     except:
         logger.exception('Exception caught running features update task')
