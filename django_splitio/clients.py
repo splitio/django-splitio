@@ -16,6 +16,9 @@ def django_client_factory():
     :return: A Django/Redis split.io client
     :rtype: DjangoClient
     """
+    if splitio_settings.API_KEY == 'localhost':
+        return localhost_client_factory()
+
     redis = splitio_settings.redis_factory()
     return RedisClient(redis)
 

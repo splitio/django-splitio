@@ -106,7 +106,9 @@ The following configuration parameters are available for the ``SPLITIO`` setting
 +------------------------+------+--------------------------------------------------------+------------------------------------------------+
 | Key                    | Type | Description                                            | Default                                        |
 +========================+======+========================================================+================================================+
-| API_KEY                | str  | The Split.io SDK API key. This entry is mandatory.     | None                                           |
+| API_KEY                | str  | The Split.io SDK API key. This entry is mandatory. If  | None                                           |
+|                        |      | "localhost" is supplied as API key, a localhost only   |                                                |
+|                        |      | client is created when get_client is called            |                                                |
 +------------------------+------+--------------------------------------------------------+------------------------------------------------+
 | SDK_API_BASE_URL       | str  | The URL base for the SDK API. This entry can be used   | 'https://sdk.split.io/api'                     |
 |                        |      | to hit a different environment different than the      |                                                |
@@ -126,15 +128,6 @@ The following configuration parameters are available for the ``SPLITIO`` setting
 |                        |      | redis clients instances. The default implementation    |                                                |
 |                        |      | uses the REDIS_HOST, REDIS_PORT and REDIS_DB to call   |                                                |
 |                        |      | the StrictRedis constructor.                           |                                                |
-+------------------------+------+--------------------------------------------------------+------------------------------------------------+
-| CLIENT_FACTORY         | str  | A string with the location of a function that returns  | 'django_splitio.clients.django_client_factory' |
-|                        |      | a Split.io cient instance. The default implementation  |                                                |
-|                        |      | uses the information on the SPLITIO Django setting to  |                                                |
-|                        |      | create a DjangoClient instance. A localhost client     |                                                |
-|                        |      | (one that never hits the Split.io backend) factory is  |                                                |
-|                        |      | provided as is can be useful during development. Check |                                                |
-|                        |      | the splitio-client documentation for more information  |                                                |
-|                        |      | on localhost clients.                                  |                                                |
 +------------------------+------+--------------------------------------------------------+------------------------------------------------+
 | DISABLED_PERIOD        | int  | How long to wait to re-enable an automatic update      | 300                                            |
 |                        |      | process after a problem was detected (in seconds).     |                                                |
@@ -188,11 +181,10 @@ This is an example of a ``.split`` file: ::
   feature_0 treatment_0
   feature_1 treatment_1
 
-In order to use this client, you set the ``CLIENT_FACTORY`` to 'django_splitio.clients.localhost_client_factory': ::
+In order to use this client, you need to set the ``API_KEY`` to 'localhost': ::
 
     SPLITIO = {
-        'API_KEY': 'this value is ignored for localhost client',
-        'CLIENT_FACTORY': 'django_splitio.clients.localhost_client_factory'
+        'API_KEY': 'localhost'
     }
 
 Afterwards, the ``get_client`` fuunction works as expected.
