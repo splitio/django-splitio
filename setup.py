@@ -14,7 +14,7 @@ with open(path.join(path.abspath(path.dirname(__file__)), 'django_splitio', 'ver
     exec (f.read())
 
 setup(name='django_splitio',
-      version='0.0.1',
+      version=__version__,
       description='Split.io Django Application',
       author='Patricio Echague',
       author_email='pato@split.io',
@@ -34,4 +34,4 @@ setup(name='django_splitio',
           'Programming Language :: Python :: 3',
           'Topic :: Software Development :: Libraries'
       ],
-      packages=['django_splitio'])
+      packages=['django_splitio','django_splitio.templatetags'])
