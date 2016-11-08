@@ -2,11 +2,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from splitio.clients import RedisClient, Client, LocalhostEnvironmentClient
 
-from splitio.impressions import AsyncTreatmentLog, CacheBasedTreatmentLog
-from splitio.metrics import AsyncMetrics, CacheBasedMetrics
-from splitio.redis_support import RedisSplitCache, RedisImpressionsCache, RedisMetricsCache
-from splitio.splits import CacheBasedSplitFetcher
-
 from .settings import splitio_settings
 
 
