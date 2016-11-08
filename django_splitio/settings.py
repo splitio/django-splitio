@@ -16,6 +16,7 @@ DEFAULTS = {
     'API_FACTORY': 'django_splitio.api.api_factory',
     'REDIS_FACTORY': 'django_splitio.cache.default_redis_factory',
     'CLIENT_FACTORY': 'django_splitio.clients.django_client_factory',
+    'SPLIT_FACTORY': 'django_splitio.factories.django_split_factory',
     'DISABLED_PERIOD': 60 * 5,
     'CONFIG': DEFAULT_CONFIG
 }
@@ -56,6 +57,12 @@ class SplitioSettings(object):
         if not hasattr(self, '_client_factory'):
             self._client_factory = import_from_string(self.CLIENT_FACTORY, 'CLIENT_FACTORY')
         return self._client_factory
+
+    @property
+    def split_factory(self):
+        if not hasattr(self, '_split_factory'):
+            self._split_factory = import_from_string(self.SPLIT_FACTORY, 'SPLIT_FACTORY')
+        return self._split_factory
 
     @property
     def user_settings(self):
