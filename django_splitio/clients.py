@@ -18,7 +18,7 @@ def django_client_factory():
 
     redis = splitio_settings.redis_factory()
 
-    labels_enabled = django_settings.SPLITIO.get('LABELS_ENABLED', True) or True
+    labels_enabled = django_settings.SPLITIO.get('LABELS_ENABLED', True)
 
     return RedisClient(redis, labels_enabled)
 
