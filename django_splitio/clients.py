@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from django.conf import settings
+from django.conf import settings as django_settings
 
 from splitio.clients import RedisClient, Client, LocalhostEnvironmentClient
 
@@ -18,7 +18,7 @@ def django_client_factory():
 
     redis = splitio_settings.redis_factory()
 
-    labels_enabled = settings.SPLITIO.get('LABELS_ENABLED', True) or True
+    labels_enabled = django_settings.SPLITIO.get('LABELS_ENABLED', True) or True
 
     return RedisClient(redis, labels_enabled)
 
