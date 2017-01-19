@@ -14,7 +14,8 @@ and development versions are installed directly from the `Github <https://github
 
   pip install -e git+git@github.com:splitio/django-splitio.git@development#egg=django_splitio
 
-This project requires a working `Celery <http://www.celeryproject.org/>`_ setup `integrated into your Django site <http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html>_` and access to a `Redis <http://redis.io/>`_ 2.6 (or later) instance.
+This project require an access to a `Redis <http://redis.io/>`_ 2.6 (or later) instance. To populate Redis with the Split.io data, the app could be configured with `Celery <http://www.celeryproject.org/>`_ setup `integrated into your Django site <http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html>_`.
+Or on the other hand, there is available a python script named ``splitio.bin.synchronizer`` in order to run as a service instead of a ``celery worker``. For production environment we recomend run it via ``supervisord``
 
 Quickstart
 ----------
@@ -46,7 +47,43 @@ With this configuration, the Split.io client will save all its information on a 
 
 In the next section you can read about all the possible configuration parameters.
 
-The next step is to schedule the Split.io related tasks. If you followed the instructions for Celery integration with Django, you'll most likely have a celery.py module that contains your Celery app. One way to schedule to schedule the tasks is to add entries to the ``CELERYBEAT_SCHEDULE`` settting, as shown in the following example: ::
+The next step is to schedule the Split.io related tasks.
+
+To configure the ``splitio.bin.synchronizer`` service just type: ::
+
+    $ /home/user/venv/bin/python -m splitio.bin.synchronizer --help
+
+    Usage:
+      synchronizer [options] <config_file>
+      synchronizer -h | --help
+      synchronizer --version
+
+    Options:
+      --splits-refresh-rate=SECONDS         The SECONDS rate to fetch Splits definitions [default: 30]
+      --segments-refresh-rate=SECONDS       The SECONDS rate to fetch the Segments keys [default: 30]
+      --impression-refresh-rate=SECONDS     The SECONDS rate to send key impressions [default: 60]
+      --metrics-refresh-rate=SECONDS        The SECONDS rate to send SDK metrics [default: 60]
+      -h --help                             Show this screen.
+      --version                             Show version.
+
+    Configuration file:
+        The configuration file is a JSON file with the following fields:
+
+        {
+          "apiKey": "YOUR_API_KEY",
+          "redisHost": "REDIS_DNS_OR_IP",
+          "redisPort": 6379,
+          "redisDb": 0
+        }
+
+
+    Examples:
+        python -m splitio.bin.synchronizer splitio-config.json
+        python -m splitio.bin.synchronizer --splits-refresh-rate=10 splitio-config.json
+
+For **production environment** we recomend run it via ``supervisord``
+
+If you followed the instructions for Celery integration with Django, you'll most likely have a celery.py module that contains your Celery app. One way to schedule to schedule the tasks is to add entries to the ``CELERYBEAT_SCHEDULE`` settting, as shown in the following example: ::
 
     # celery.py
     from __future__ import absolute_import
@@ -91,10 +128,11 @@ The next step is to schedule the Split.io related tasks. If you followed the ins
 
 The convenience methods ``get_features_update_schedule``, ``get_segments_update_schedule``, ``get_impressions_update_schedule`` and ``get_metrics_update_schedule`` are provided to set the task's schedule according to the Split.io client configuration.
 
-Once everythig has been set-up and the celery tasks are and up running, you can request the treatment for user using the client provided by the ``get_client`` function: ::
+Once everythig has been set-up and the celery tasks are and up running, you can request the treatment for user using the client provided by the ``get_factory`` function: ::
 
-  >>> from django_splitio import get_client
-  >>> client = get_client()
+  >>> from django_splitio import get_factory
+  >>> factory = get_factory()
+  >>> client = factory.client()
   >>> client.get_treatment('some_user', 'some_feature')
   'SOME_TREATMENT'
 
@@ -154,13 +192,6 @@ The ``CONFIG`` SPLITIO setting mimics the behaviour of the ``config`` parameter 
 +------------------------+------+--------------------------------------------------------+---------+
 | impressionsRefreshRate | int  | The impressions report period in seconds               | 60      |
 +------------------------+------+--------------------------------------------------------+---------+
-| ready                  | int  | How long to wait (in milliseconds) for the features    |         |
-|                        |      | and segments information to be available. If the       |         |
-|                        |      | timeout is exceeded, a ``TimeoutException`` will be    |         |
-|                        |      | raised. If value is 0, the constructor will return     |         |
-|                        |      | immediately but not all the information might be       |         |
-|                        |      | available right away.                                  |         |
-+------------------------+------+--------------------------------------------------------+---------+
 
 The localhost environment
 -------------------------
@@ -187,10 +218,11 @@ In order to use this client, you need to set the ``API_KEY`` to 'localhost': ::
         'API_KEY': 'localhost'
     }
 
-Afterwards, the ``get_client`` fuunction works as expected.
+Afterwards, the ``get_factory().client()`` function works as expected.
 
-  >>> from django_splitio import get_client
-  >>> client = SelfRefreshingClient()
+  >>> from django_splitio import get_factory
+  >>> factory = get_factory()
+  >>> client = factory.client()
   >>> client.get_treatment('some_user', 'feature_0')
   'treatment_0'
   >>> client.get_treatment('some_other_user', 'feature_0')

@@ -1,11 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from splitio.clients import RedisClient, Client, LocalhostEnvironmentClient
+from django.conf import settings as django_settings
 
-from splitio.impressions import AsyncTreatmentLog, CacheBasedTreatmentLog
-from splitio.metrics import AsyncMetrics, CacheBasedMetrics
-from splitio.redis_support import RedisSplitCache, RedisImpressionsCache, RedisMetricsCache
-from splitio.splits import CacheBasedSplitFetcher
+from splitio.clients import RedisClient, Client, LocalhostEnvironmentClient
 
 from .settings import splitio_settings
 
@@ -20,7 +17,10 @@ def django_client_factory():
         return localhost_client_factory()
 
     redis = splitio_settings.redis_factory()
-    return RedisClient(redis)
+
+    labels_enabled = django_settings.SPLITIO.get('LABELS_ENABLED', True)
+
+    return RedisClient(redis, labels_enabled)
 
 
 def localhost_client_factory():
