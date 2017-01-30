@@ -4,12 +4,6 @@ from django.conf import settings
 
 from splitio.factories import get_factory as get_splitio_factory
 
-from .settings import splitio_settings
-
-
-def django_split_factory():
-    pass
-
 def get_factory():
     """Returns a split.io client/manager factory implementation using the configuration given
         in the SPLITIO section of the Django settings.
