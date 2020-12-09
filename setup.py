@@ -2,7 +2,6 @@
 
 from os import path
 from setuptools import setup
-from django_splitio import __version__
 
 # install_requires = ['splitio_client>=2.2']
 
