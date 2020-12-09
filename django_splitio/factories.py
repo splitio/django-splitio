@@ -13,7 +13,7 @@ def get_factory():
     """
     # Get config from Django settings
     sdk_config = settings.SPLITIO
-    api_key = sdk_config['apiKey']
+    api_key = settings.SPLITIO.get('apiKey', '')
 
     return get_splitio_factory(
         api_key,
